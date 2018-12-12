@@ -1,0 +1,1 @@
+sphinx-build -b html . /tmp/blog_build/

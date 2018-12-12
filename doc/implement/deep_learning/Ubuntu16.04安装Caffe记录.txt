@@ -1,0 +1,64 @@
+Ubuntu16.04安装Caffe记录
+=======================
+
+
+**步骤如下**
+
+安装驱动和cuda
+
+:: 
+
+    sudo apt-get install dkms
+    sudo sh cuda_8.0.61_375.26_linux.run
+
+安装后，无限重启。卸载
+
+:: 
+
+    nvidia-uninstall 
+    apt-get remove nvidia*
+
+
+联网安装驱动和CUDA
+
+::
+
+    sudo apt-get update
+    sudo apt-get install nvidia-367
+    sudo apt-get install mesa-common-dev
+    sudo apt-get install freeglut3-dev
+
+之后重启系统让GTX1080显卡驱动生效。
+
+
+caffe安装问题
+
+make问题，cannot find hdf5.h
+
+- 使用命令sudo find / -name hdf5.h,找到相应的路径之后，把路径加到Makefile.config中。
+
+- 比如，我的hdf5.h的路径为：`/usr/include/hdf5/serial/hdf5.h`, 则修改Makefile.config中的项"INCLUDE_DIRS"为：
+
+    :: 
+
+        INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/include/hdf5/serial \
+                    /usr/local/include
+
+make问题，/usr/bin/ld: cannot find -lhdf5
+
+- 使用命令sudo find / -name libhdf5.so，我找到的路径为：`/usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so`, 此时要修改Makefile.config中的项"LIBRARY_DIRS"为 
+
+    ::
+
+        LIBRARY_DIRS := $(PYTHON_LIB) /usr/lib/x86_64-linux-gnu/hdf5/serial \
+                    /usr/local/lib /usr/lib
+
+总之，编译caffe时提示找不到一些文件时，可以使用命令“sudo find / -name 文件名” 来找到相应的路径，再把相关路径加入到文件caffe-master/Makefile.config之中即可。
+
+make问题，找不到-lopenblas
+
+- ln -s /usr/lib/libblas.so.3 /usr/lib/libopenblas.so 
+
+make pycaffe问题fatal error:numpy/arrayobject.h: 没有那文件或者目录
+    
+- 安装python-numpy, `sudo apt install python-numpy`
